@@ -8,7 +8,7 @@ ParametersAlu p_alu = ParametersAlu();
 void write_counts(map <seqan::CharString, map<int, int> > &rg_lenCounts, string &rg_lenCnt_file){
   map <seqan::CharString, map<int, int> >::iterator sii;
   map<int, int>::iterator si;
-  cout << "output to: " << rg_lenCnt_file << endl;
+  cout << "output to: " << rg_lenCnt_file << "*\n";
   for (sii = rg_lenCounts.begin(); sii != rg_lenCounts.end() ; sii++) {
     ofstream fout((rg_lenCnt_file + toCString(sii->first)).c_str());
     for (si = (sii->second).begin(); si != (sii->second).end(); si++) 
