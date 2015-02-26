@@ -27,9 +27,9 @@ void read_pn(map <seqan::CharString, map<int, int> > &rg_lenCnt, string &bamInpu
     readRecord(record, bamStreamIn);
     if ( record.rID != record.rNextId ) continue;
     if ( record.rID > 20 ) break;  // only count from chr0 - chr21
+    i++;    
     if ( i < jump_first) continue;
     if ( max_read_num and i > max_read_num ) break;    
-    i++;    
     
     //if ( i % 1000 == 0) cout << "done " << i << " " << rg_lenCnt.size() << endl;
     if ((not hasFlagQCNoPass(record) ) and hasFlagAllProper(record) and (not hasFlagDuplicate(record)) and hasFlagMultiple(record) ) {
@@ -97,7 +97,7 @@ int main( int argc, char* argv[] )
     
     string rg_lenCnt_file = path_count + pn + ".count."; /* + RG*/
     map <seqan::CharString, map<int, int> > rg_lenCnt; // strata by reading group 
-    read_pn(rg_lenCnt, bamInput_file, 5e3, 2e8);  // use only 20% of 30X reads to estimate
+    read_pn(rg_lenCnt, bamInput_file, 5e3, 2e8);  // use only 20% of 30X reads to estimate 
     write_counts(rg_lenCnt, rg_lenCnt_file); 
 
     stringstream ss;
