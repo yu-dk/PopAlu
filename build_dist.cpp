@@ -4,12 +4,15 @@
 #include "utils.h"
 
 ParametersAlu p_alu = ParametersAlu();
+string rg_default = "default";
 
 void write_counts(map <seqan::CharString, map<int, int> > &rg_lenCounts, string &rg_lenCnt_file){
   map <seqan::CharString, map<int, int> >::iterator sii;
   map<int, int>::iterator si;
-  cout << "output to: " << rg_lenCnt_file << "*\n";
+  cout << "output to: " << rg_lenCnt_file << "*\n"
+       << "in total " << rg_lenCounts.size() << " RG groups\n";
   for (sii = rg_lenCounts.begin(); sii != rg_lenCounts.end() ; sii++) {
+    cout << "RG: " << sii->first << endl;
     ofstream fout((rg_lenCnt_file + toCString(sii->first)).c_str());
     for (si = (sii->second).begin(); si != (sii->second).end(); si++) 
       fout << si->first << " "  << si->second << endl;
@@ -35,8 +38,11 @@ void read_pn(map <seqan::CharString, map<int, int> > &rg_lenCnt, string &bamInpu
     if ((not hasFlagQCNoPass(record) ) and hasFlagAllProper(record) and (not hasFlagDuplicate(record)) and hasFlagMultiple(record) ) {
       if (hasFlagFirst(record)) continue; // look at only one end of the pair      
       seqan::BamTagsDict tags(record.tags);
-      if (!findTagKey(idx_RG, tags, "RG")) continue; 
-      seqan::CharString rg = getTagValue(tags, idx_RG); // idx_RG is the idx at the tag dict.
+      seqan::CharString rg;
+      if (findTagKey(idx_RG, tags, "RG"))
+	rg = getTagValue(tags, idx_RG); // idx_RG is the idx at the tag dict.
+      else
+	rg = ::rg_default;
       addKey(rg_lenCnt[rg], abs(record.tLen));    
     }    
   }  
@@ -48,7 +54,10 @@ void write_pdf(string &f_count, string &f_prob, int _len_min, int bin_width){
   map <int, int> bin_counts;
   fstream fin;
   fin.open(f_count.c_str());
-  assert(fin);
+  if (!fin) {
+    cerr << "ERROR: " << f_count << " not exist\n";
+    exit(0);
+  }
   int mLen=0, mCnt=0;
   // get len_min and len_max
   while (fin >> insertlen >> count) {
@@ -117,7 +126,6 @@ int main( int argc, char* argv[] )
       fout << rg << endl;
       string f_count = path_count + pn + ".count." + rg;
       string f_prob = path_prob + pn + ".count." + rg + "." + ::p_alu.pdf_param;
-      cout << f_count << " " << bin_width << endl;
       write_pdf(f_count, f_prob, len_min, bin_width);    
     }
     fout.close(); 
