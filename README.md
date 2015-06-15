@@ -34,3 +34,11 @@ Running the program
     opt3/alu_usage build_dist
     opt3/alu_usage alu_delete
     opt3/alu_usage alu_insert
+
+Reference
+---------
+
+Please cite:
+Qian Y, Kehr B, Halldórsson BV. (2015) PopAlu: population-scale discovery of Alu polymorphisms. PeerJ PrePrints 3:e1430
+
+https://peerj.com/preprints/1174/
