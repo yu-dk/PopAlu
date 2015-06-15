@@ -1,0 +1,51 @@
+*** Overview
+
+The simulation is split into two steps:
+
+1) Generating a set of Alu insertions/deletions (VCF file) and the corresponding reference.
+2) Read simulation using MASON (BAM files) for sets of individuals in which the insertions/deletions are present or not (at specific frequencies).
+
+You will first have to generate a single VCF file. Based on this file you can create BAM files for individuals.
+The VCF file is generated once, while the BAM files are per individual.
+Creating the VCF files is a matter of seconds, whereas the read simulation takes a while even for a single individual (it performs simulation of reads and read alignment).
+
+
+*** Details for step 1)
+
+There are two python scripts that read the sequence of a reference chromosome and a file with Alu positions:
+    - simulate_insertions.py
+    - simulate_deletions.py
+
+Both scripts expect only one fasta record for a single chromosome in the input fasta file.
+You have to crop the chromosome of interest beforehand.
+Optionally, you can specify the number of insertions/deletions that you want to have in your data set, default is 100.
+
+Both python scripts output a VCF file with the insertions or deletions that you will need for step 2).
+In addition, simulate_insertions.py outputs a fasta file with a modified chromosome sequence, which you have to use in step 2).
+Replace the original chromosome in a copy of the whole genome fasta file and create a BWA index (bwa index <genome.fa>).
+You need this index for step 2).
+
+
+*** Details for step 2)
+
+There is a bash script that creates a directory with all the output files for one individual:
+   - simulated_bam.sh
+
+Its five parameters are described at the top of the script:
+WD=$1      # path to output directory for simulated individual (will be created)
+REFCHR=$2  # fasta file with the (modified) reference chromosome
+GENOME=$3  # fasta file with the (modified) whole reference genome (BWA index files have to be present in the same directory)
+INS=$4     # VCF file with insertions (deleted from reference) or deletions
+SEED=$5    # seed for simulation (use a different seed for each individual)
+
+You will also find a section '# PATHS' in the script that specifies paths to all dependencies.
+You have to change this section to point to your directories containing
+ - BWADIR: bwa mem
+ - SAMDIR: samtools
+ - SCRIPTDIR: add_variants.py (should be present in the same directory as this README file)
+ - MASONDIR: the SeqAn tools mason_variator and mason_simulator
+
+On success, the script creates the following files in the specified output directory:
+ - hap_0.fa, hap_1.fa: fasta files with the haplotype sequences (with SNPs and indels in addition to some of the deletions/insertions from VCF file) from which the reads were simulated
+ - truth_0.bam, truth_1.bam: the original locations/correct alignments of the reads to the reference
+ - mapped.bam: a mapping by BWA of the simulated reads to the reference genome (input to Alu detection programs)
