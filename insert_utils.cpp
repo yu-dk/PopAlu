@@ -556,7 +556,7 @@ bool combine_pns_vcf(float read_dist_th, string path0, string f_in_suffix, strin
 	    if (!altCnt) continue;
 	    int _pos = (pi3->first).first;
 	    int _tcnt = midCnts_clip[_pos] + midCnts_alu[_pos];
-	    if ( _tcnt < 5 ) continue;  // if total evidence is too small, ignore this position. fixme: comment this line if sample size small 
+	    //if ( _tcnt < 5 ) continue;  // if total evidence is too small, ignore this position. fixme: comment this line if sample size small 
 	    float alu_evidence =  (float) midCnts_alu[_pos] / (float) _tcnt;
 	    if ( alu_evidence < read_dist_th or 1 - alu_evidence < read_dist_th ) 
 		continue;
