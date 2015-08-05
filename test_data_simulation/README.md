@@ -62,6 +62,7 @@ You can, for example, use the following commands to do this:
 
 * Determine the lines where the chromosome you want to replace starts and ends:
 
+
     $ grep -n ">" /path/to/genome.fa.fai
     ...
     39737155:>21
@@ -69,6 +70,7 @@ You can, for example, use the following commands to do this:
     ...
 
 * Concatenate the reference genome with the head, cat and tail commands:
+
 
     $ head -n 39737154 /path/to/genome.fa > genome_ins.fa
     $ cat chr21.fa >> genome_ins.fa
