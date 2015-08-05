@@ -75,10 +75,6 @@ chr_seq = chr_seq.upper()
 
 alu_pos = []
 for line in open(alufile):
-    if line[0:3] != "chr":
-        print "ERROR_ Expecting lines in alufile to start with 'chr'."
-        exit()
-
     # read the begin and end position from line
     line = line.split()
     begin = int(line[1])
@@ -114,7 +110,7 @@ vcffile.write("##INFO=<ID=AF,Number=A,Type=Float,Description=\"Allele Frequency\
 vcffile.write("##INFO=<ID=SVLEN,Number=.,Type=Integer,Description=\"Difference in length between REF and ALT alleles\">\n")
 vcffile.write("##INFO=<ID=SVTYPE,Number=1,Type=String,Description=\"Type of structural variant\">\n")
 vcffile.write("##contig=<ID=" + chr_id + ",length=" + str(len(chr_seq)) + ">\n")
-vcffile.write("#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  simulated)\n")
+vcffile.write("#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  simulated\n")
 
 # write records
 total_alu_len = 0
