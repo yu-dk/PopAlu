@@ -5,12 +5,12 @@ This file describes how to simulate an Alu polymorphism data set using the refer
 
 You have two options:
 
-a. Use the precomputed files `deletions.vcf` and `insertions.vcf` to re-generate the test data with 110 Alu polymorphisms on chr21 described in Qian et al. (2015). In this case you can skip step 1 below.
+1. Use the precomputed files `deletions.vcf` and `insertions.vcf` to re-generate the test data with 110 Alu polymorphisms on chr21 described in Qian et al. (2015). In this case you can skip step 1 below.
    Use hg19 in step 2 and the parameters as specified in the examples of step 3.
-b. Generate your own set of insertions or deletions using the scripts `simulate_deletions.py` and `simulated_insertions.py`.
+2. Generate your own set of insertions or deletions using the scripts `simulate_deletions.py` and `simulated_insertions.py`.
    Here, you need to provide a file with Alu positions in the reference genome.
 
-Step 1 is only necessary if you choose option b.
+Step 1 is only necessary if you choose option 1.
 In both cases, you need to prepare the reference genome (step 2) and run the skript `simulate_bam.py` (step 3) for generating and mapping reads using MASON and BWA-mem.
 
 
@@ -23,24 +23,24 @@ In addition, both scripts write a fasta file with the sequences of the selected 
 As input, the scripts expect only a single chromosome in the fasta file.
 The file with Alu positions has to have six columns, but only columns 1-4 and 6 are being used:
 
-   CHR  BEGIN  END  FAMILY  TYPE  ORIENTATION
+    CHR  BEGIN  END  FAMILY  TYPE  ORIENTATION
 
 For example:
 
-   21  9986723   9987040   AluJb   SINE  +
-   21  16253851  16254014  AluJo   SINE  +
-   21  16347146  16347430  AluJb   SINE  +
-   21  16735634  16735945  AluSx1  SINE  -
-   21  17369195  17369499  AluY    SINE  +
-   ...
+    21  9986723   9987040   AluJb   SINE  +
+    21  16253851  16254014  AluJo   SINE  +
+    21  16347146  16347430  AluJb   SINE  +
+    21  16735634  16735945  AluSx1  SINE  -
+    21  17369195  17369499  AluY    SINE  +
+    ...
 
 If you run the scripts without parameters, they should print a short usage line:
 
-  $ simulate_deletions.py
-  Usage: ./simulate_deletions.py <ref.fa> <alu positions> [<num del> [<seed>]]
-
-  $ simulate_insertions.py
-  Usage: ./simulate_insertions.py <ref.fa> <alu positions> [<num ins> [<seed>]]
+    $ simulate_deletions.py
+    Usage: ./simulate_deletions.py <ref.fa> <alu positions> [<num del> [<seed>]]
+    
+    $ simulate_insertions.py
+    Usage: ./simulate_insertions.py <ref.fa> <alu positions> [<num ins> [<seed>]]
 
 Replace `<ref.fa>` by your fasta file containing the chromosome and `<alu positions>` by the file listing the Alu positions.
 Optionally, you can specify the number of insertions/deletions that you want to have in your data set, default is 100.
@@ -55,30 +55,30 @@ Step 2 - Prepare the reference genome and BWA index
 
 For creating a deletion data set, we only need a bwa index of the reference genome generated as usual:
 
-$ bwa index /path/to/genome.fa
+    $ bwa index /path/to/genome.fa
 
 For creating the insertion data set, you need to replace the modified chromosome in the reference genome before creating the bwa index.
 You can, for example, use the following commands to do this:
 
 * Determine the lines where the chromosome you want to replace starts and ends:
 
-   $ grep -n ">" /path/to/genome.fa.fai
-   ...
-   39737155:>21
-   40424726:>22
-   ...
+    $ grep -n ">" /path/to/genome.fa.fai
+    ...
+    39737155:>21
+    40424726:>22
+    ...
 
 * Concatenate the reference genome with the head, cat and tail commands:
 
-   $ head -n 39737154 /path/to/genome.fa > genome_ins.fa
-   $ cat chr21.fa >> genome_ins.fa
-   $ tail -n +40424726 /path/to/genome.fa >> genome_ins.fa
+    $ head -n 39737154 /path/to/genome.fa > genome_ins.fa
+    $ cat chr21.fa >> genome_ins.fa
+    $ tail -n +40424726 /path/to/genome.fa >> genome_ins.fa
 
 Make sure to substract 1 from the start line number in the head command.
 
 Finally, create the bwa index for your modified reference genome:
 
-   $ bwa index genome_ins.fa
+    $ bwa index genome_ins.fa
 
 
 Step 3 - Simulate and align the reads
@@ -99,25 +99,25 @@ Before running the script, open the script in an editor and modify the `PATHS` s
 
 Before running the script, have a look at its five parameters described at the top of the script:
 
-   WD=$1      # path to output directory for simulated individual (created if it does not exist)
-   REFCHR=$2  # fasta file with the (modified) reference chromosome
-   GENOME=$3  # fasta file with the (modified) whole reference genome (BWA index files have to be present in the same directory)
-   INS=$4     # VCF file with insertions (deleted from reference) or deletions
-   SEED=$5    # seed for simulation (use a different seed for each individual)
+    WD=$1      # path to output directory for simulated individual (created if it does not exist)
+    REFCHR=$2  # fasta file with the (modified) reference chromosome
+    GENOME=$3  # fasta file with the (modified) whole reference genome (BWA index files have to be present in the same directory)
+    INS=$4     # VCF file with insertions (deleted from reference) or deletions
+    SEED=$5    # seed for simulation (use a different seed for each individual)
 
 Run the script on the files created in the previous steps, e.g.
 
-   $ simulate_bam.sh INS00 chr21_ins.fa genome_ins.fa insertions.vcf 0
-   $ simulate_bam.sh INS01 chr21_ins.fa genome_ins.fa insertions.vcf 1
-   ...
-   $ simulate_bam.sh INS99 chr21_ins.fa genome_ins.fa insertions.vcf 99
+    $ simulate_bam.sh INS00 chr21_ins.fa genome_ins.fa insertions.vcf 0
+    $ simulate_bam.sh INS01 chr21_ins.fa genome_ins.fa insertions.vcf 1
+    ...
+    $ simulate_bam.sh INS99 chr21_ins.fa genome_ins.fa insertions.vcf 99
 
 for simulating an insertions data set or
 
-   $ simulate_bam.sh DEL00 chr21.fa /path/to/genome.fa deletions.vcf 0
-   $ simulate_bam.sh DEL01 chr21.fa /path/to/genome.fa deletions.vcf 1
-   ...
-   $ simulate_bam.sh DEL99 chr21.fa genome_ins.fa insertions.vcf 99
+    $ simulate_bam.sh DEL00 chr21.fa /path/to/genome.fa deletions.vcf 0
+    $ simulate_bam.sh DEL01 chr21.fa /path/to/genome.fa deletions.vcf 1
+    ...
+    $ simulate_bam.sh DEL99 chr21.fa genome_ins.fa insertions.vcf 99
 
 for simulating a deletions data set.
 
